@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import Input from "@/components/Input";
 import LogoHeader from "@/components/LogoHeader";
 import Link from "next/link";
 import React, { useRef, useState } from "react";

@@ -2,7 +2,11 @@ import React from "react";
 import QRCode from "react-qr-code";
 
 type ModalQRCodeProps = {
-  data: any; // Adjust the type to match the data you are using
+  data: {
+    fullName: string;
+    phone: string;
+    memberID: string;
+  } | null;
   closeModal: () => void;
 };
 
@@ -26,7 +30,7 @@ const ModalQRCode: React.FC<ModalQRCodeProps> = ({ data, closeModal }) => {
           <div className="flex justify-center items-center my-2 px-16 ">
             <QRCode
               style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              value={data?.memberID ?? ""}
+              value={data?.memberID || ""}
             />
           </div>
 

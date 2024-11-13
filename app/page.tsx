@@ -6,7 +6,7 @@ import LogoHeader from "@/components/LogoHeader";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-export default function auth() {
+export default function Auth() {
   // router untuk redirect
   const router = useRouter();
 

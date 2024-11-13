@@ -47,6 +47,9 @@ export default function Store() {
     return txt.value;
   };
 
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading data: {error}</p>;
+
   return (
     <div className="bg-base-accent min-h-screen">
       <Header>
