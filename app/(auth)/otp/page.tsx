@@ -31,7 +31,7 @@ export default function Otp() {
 
   const handleChange = (e: { target: { value: string } }, index: number) => {
     const val = e.target.value;
-    let updatedValues = [...otpValues];
+    const updatedValues = [...otpValues];
     updatedValues[index] = val;
     setOtpValues(updatedValues);
 
