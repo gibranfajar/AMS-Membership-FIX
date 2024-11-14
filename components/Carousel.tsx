@@ -15,7 +15,7 @@ const Carousel: React.FC = () => {
 
   useEffect(() => {
     fetchPromos(member as string);
-  }, [member]);
+  }, []);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;

@@ -6,11 +6,9 @@ import Input from "@/components/Input";
 import LogoHeader from "@/components/LogoHeader";
 import Link from "next/link";
 import { authLogin } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 export default function Login() {
-  const router = useRouter();
   const [isError, setIsError] = useState(false);
   const [inputError, setInputError] = useState<{ [key: string]: string }>({});
 

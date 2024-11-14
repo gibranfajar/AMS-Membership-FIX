@@ -5,6 +5,26 @@ import { useTierContext } from "@/context/TierContext";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
+interface BenefitData {
+  point_1: string;
+  point_2: string;
+  point_3: string;
+  point_4: string;
+  point_5: string;
+  point_6: string;
+  point_7: string;
+  point_8: string;
+}
+
+interface Tier {
+  id: number;
+  tier: string;
+  amountStartingFrom: number;
+  amountUpTo: number;
+  tier_image: string;
+  benefitData: BenefitData;
+}
+
 export default function TierInfo() {
   const member = localStorage.getItem("member");
   const { tierData, loading, error, fetchTier } = useTierContext();
@@ -13,15 +33,9 @@ export default function TierInfo() {
     if (member) {
       fetchTier(member);
     }
-  }, [member]);
+  }, []);
 
-  const [selectedTier, setSelectedTier] = useState<{
-    id: number;
-    tier: string;
-    amountStartingFrom: number;
-    amountUpTo: number;
-    benefitData: Record<string, string>;
-  } | null>(null);
+  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
 
   const options = tierData
     ? tierData.map((tier) => ({
@@ -32,15 +46,13 @@ export default function TierInfo() {
 
   useEffect(() => {
     if (tierData && tierData.length > 0) {
-      // Set default to tier 0 (the first tier)
-      setSelectedTier(tierData[0] as any);
+      setSelectedTier(tierData[0] || null);
     }
   }, [tierData]);
 
   const handleChangeTier = (value: string) => {
-    // Cari data tier yang sesuai berdasarkan ID yang dipilih
     const selected = tierData?.find((tier) => tier.id === parseInt(value));
-    setSelectedTier(selected as any);
+    setSelectedTier(selected || null);
   };
 
   if (loading) return <p>Loading...</p>;
