@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import "./globals.css";
-import { Provider } from "react-redux";
-import store from "../store/store";
+import AppProviders from "@/context/AppProvider";
 
 interface FullscreenElement extends HTMLElement {
   mozRequestFullScreen?: () => void;
@@ -38,8 +37,9 @@ export default function RootLayout({
     // Tambahkan event listener pada click untuk memulai fullscreen
     document.addEventListener("click", handleUserInteraction);
 
+    // Pastikan event listener dibersihkan saat komponen unmount
     return () => {
-      document.removeEventListener("click", handleUserInteraction); // Pastikan event listener dibersihkan saat komponen unmount
+      document.removeEventListener("click", handleUserInteraction);
     };
   }, []);
 
@@ -49,7 +49,7 @@ export default function RootLayout({
         <title>AMS Membership</title>
       </head>
       <body className={`antialiased`}>
-        <Provider store={store}>{children}</Provider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

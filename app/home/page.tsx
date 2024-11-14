@@ -1,29 +1,14 @@
 "use client";
 
-import { fetchUser } from "@/actions/userAction";
 import Brand from "@/components/Brand";
 import Carousel from "@/components/Carousel";
 import ModalInputPin from "@/components/ModalInputPin";
 import ModalQRCode from "@/components/ModalQrCode";
 import TabBar from "@/components/TabBar";
-import useFetch from "@/hooks/useFetch";
+import { useUserContext } from "@/context/UserContext";
 import Image from "next/image";
 import Link from "next/link";
 import React, { FormEvent, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-type TierInfo = {
-  tier: string;
-};
-
-type MemberInfo = {
-  memberID: string;
-  fullName: string;
-  phone: string;
-  pin: string;
-  points: number;
-  tierInfo: TierInfo;
-};
 
 export default function Home() {
   const member = localStorage.getItem("member");
@@ -32,23 +17,13 @@ export default function Home() {
   const [pin, setPin] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
 
-  const dispatch = useDispatch();
-  const users = useSelector((state: any) => state.users.user);
-
-  if (users.loading === true) {
-    return <p>Loading...</p>;
-  }
+  const { userData, loading, error, fetchUser } = useUserContext();
 
   useEffect(() => {
     if (member) {
-      fetchUser(dispatch);
+      fetchUser(member);
     }
-  }, [dispatch, member]);
-
-  // const { data, loading, error } = useFetch<MemberInfo>(
-  //   `https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=${member}`,
-  //   "memberInfoData"
-  // );
+  }, [member]);
 
   const handlePopUpQr = () => {
     setIsModalVisible(true);
@@ -61,7 +36,7 @@ export default function Home() {
 
   const handleCheckPin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (pin === users.pin) {
+    if (pin === userData?.pin) {
       setIsModalVisible(false);
       setIsShowQr(true);
       setPin("");
@@ -73,23 +48,19 @@ export default function Home() {
     }
   };
 
-  // if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading data: {error}</p>;
 
   return (
     <div className="bg-base-accent min-h-screen">
       <div className="flex justify-between items-center p-8">
-        <span className="text-sm text-white">{users.fullName}</span>
+        <span className="text-sm text-white">{userData?.fullName}</span>
         <div className="flex justify-center items-center gap-2">
           <div className="flex flex-col items-end">
             <span className="text-xs text-white">Tier Kamu</span>
-            {users && users.tierInfo ? (
-              <span className="text-xs text-white">{users.tierInfo.tier}</span>
-            ) : (
-              <span className="text-xs text-white">
-                Tier information unavailable
-              </span>
-            )}
+            <span className="text-xs text-white">
+              {userData?.tierInfo.tier}
+            </span>
           </div>
           <Image
             src="/images/tier/logo-tier.svg"
@@ -114,7 +85,7 @@ export default function Home() {
         <div className="flex justify-between items-center">
           <div className="flex flex-col items-start">
             <span className="text-xs">TOTAL POIN</span>
-            <span className="font-medium">Rp. {users.points}</span>
+            <span className="font-medium">Rp. {userData?.points}</span>
           </div>
           <div
             className="flex items-center justify-center border border-base-accent rounded-lg p-2 gap-2 cursor-pointer"
@@ -144,7 +115,7 @@ export default function Home() {
       )}
 
       {/* Modal for QR code */}
-      {isShowQr && <ModalQRCode data={users} closeModal={closeModal} />}
+      {isShowQr && <ModalQRCode data={userData} closeModal={closeModal} />}
 
       <div className="flex justify-between items-center p-8 gap-2 bg-white -top-20 relative">
         <div className="flex flex-col justify-center items-center gap-2">

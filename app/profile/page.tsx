@@ -3,7 +3,7 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
-import useFetch from "@/hooks/useFetch";
+import { useUserDetailContext } from "@/context/UserDetailContext";
 import React, { FormEvent, useEffect, useState } from "react";
 
 type MemberInfo = {
@@ -30,6 +30,7 @@ type ApiResponseOption = {
 type Option = { id: string | number; label: string };
 
 export default function Profile() {
+  const member = localStorage.getItem("member");
   const [optionsProv, setOptionsProv] = useState<Option[]>([]);
   const [optionsCity, setOptionsCity] = useState<Option[]>([]);
   const [prov, setProv] = useState("");
@@ -47,18 +48,21 @@ export default function Profile() {
     gender: "",
   });
 
-  const { data, loading, error } = useFetch<MemberInfo>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/profile?memberID=1124537252593",
-    "memberData"
-  );
+  const { userData, loading, error, fetchUser } = useUserDetailContext();
 
   useEffect(() => {
-    if (data) {
-      setFormData(data);
-      setProv(data.provinceID);
-      setCity(data.cityID);
+    if (member) {
+      fetchUser(member);
     }
-  }, [data]);
+  }, [member]);
+
+  useEffect(() => {
+    if (userData) {
+      setFormData(userData);
+      setProv(userData.provinceID);
+      setCity(userData.cityID);
+    }
+  }, [userData]);
 
   useEffect(() => {
     const fetchDataProvince = async () => {
@@ -147,13 +151,16 @@ export default function Profile() {
             labelOption="Pilih Provinsi"
             options={optionsProv}
             value={prov}
-            onChange={(e) =>
+            onChange={(e) => {
+              const selectedProv = e.target.value;
+              setProv(selectedProv); // Memperbarui state provinsi
+              setCity(""); // Mengosongkan kota sebelumnya
               setFormData((prev) => ({
                 ...prev,
-                prov: e.target.value,
-                city: "",
-              }))
-            }
+                province: selectedProv, // Menyimpan provinsi di formData
+                city: "", // Mengosongkan kota saat provinsi diubah
+              }));
+            }}
             className="mb-4"
           />
           <Select
@@ -161,14 +168,17 @@ export default function Profile() {
             labelOption="Pilih Kota"
             options={optionsCity}
             value={city}
-            onChange={(e) =>
+            onChange={(e) => {
+              const selectedCity = e.target.value;
+              setCity(selectedCity); // Memperbarui state kota
               setFormData((prev) => ({
                 ...prev,
-                city: e.target.value,
-              }))
-            }
+                city: selectedCity, // Menyimpan kota di formData
+              }));
+            }}
             className="mb-4"
           />
+
           <Select
             labelSelect="*Jenis Kelamin"
             labelOption="Pilih Jenis Kelamin"

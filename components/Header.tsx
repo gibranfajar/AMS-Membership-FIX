@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ children, className = "" }: HeaderProps) {
   return (
-    <div className="bg-white shadow-lg p-8 rounded-b-3xl">
+    <div className="bg-white shadow-lg p-8 rounded-b-3xl sticky top-0">
       <div className="flex items-center">
         <Image
           src="/images/arrow-left.svg"

@@ -1,56 +1,46 @@
 "use client";
 
 import Select from "@/components/Select";
-import useFetch from "@/hooks/useFetch";
+import { useTierContext } from "@/context/TierContext";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-type TierInfo = {
-  id: number;
-  tier: string;
-  amountStartingFrom: number;
-  amountUpTo: number;
-  tier_image: string;
-  benefitData: BenefitData;
-};
-
-type BenefitData = {
-  point_1: string;
-  point_2: string;
-  point_3: string;
-  point_4: string;
-  point_5: string;
-  point_6: string;
-  point_7: string;
-  point_8: string;
-};
-
 export default function TierInfo() {
-  const { data, loading, error } = useFetch<TierInfo[]>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/tier/list?memberID=1124537252593",
-    "tierData"
-  );
+  const member = localStorage.getItem("member");
+  const { tierData, loading, error, fetchTier } = useTierContext();
 
-  const [selectedTier, setSelectedTier] = useState<TierInfo | null>(null);
+  useEffect(() => {
+    if (member) {
+      fetchTier(member);
+    }
+  }, [member]);
 
-  const options = data
-    ? data.map((tier) => ({
-        id: tier.id,
+  const [selectedTier, setSelectedTier] = useState<{
+    id: number;
+    tier: string;
+    amountStartingFrom: number;
+    amountUpTo: number;
+    benefitData: Record<string, string>;
+  } | null>(null);
+
+  const options = tierData
+    ? tierData.map((tier) => ({
+        id: tier.id.toString(),
         label: tier.tier,
       }))
     : [];
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (tierData && tierData.length > 0) {
       // Set default to tier 0 (the first tier)
-      setSelectedTier(data[0]);
+      setSelectedTier(tierData[0] as any);
     }
-  }, [data]);
+  }, [tierData]);
 
   const handleChangeTier = (value: string) => {
     // Cari data tier yang sesuai berdasarkan ID yang dipilih
-    const selected = data?.find((tier) => tier.id === parseInt(value));
-    setSelectedTier(selected || null);
+    const selected = tierData?.find((tier) => tier.id === parseInt(value));
+    setSelectedTier(selected as any);
   };
 
   if (loading) return <p>Loading...</p>;
