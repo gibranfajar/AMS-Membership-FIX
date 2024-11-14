@@ -12,6 +12,7 @@ type SelectProps = {
   value: string | number;
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   className?: string;
+  error?: string;
 };
 
 export default function Select({
@@ -21,6 +22,7 @@ export default function Select({
   value,
   onChange,
   className,
+  error,
 }: SelectProps) {
   return (
     <div className={`relative ${className}`}>
@@ -37,6 +39,7 @@ export default function Select({
           </option>
         ))}
       </select>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }
