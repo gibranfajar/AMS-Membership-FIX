@@ -22,7 +22,7 @@ export default function Store() {
     if (member) {
       fetchStore(member);
     }
-  }, []);
+  }, [fetchStore]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [detail, setDetail] = useState<Store | null>(null);

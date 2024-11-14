@@ -65,7 +65,7 @@ export default function Login() {
       } else {
         console.error("Respons tidak terduga:", response);
       }
-    } catch (e) {
+    } catch (error) {
       setData((prevData) => ({
         ...prevData,
         error: "Login gagal. Silakan coba lagi.",

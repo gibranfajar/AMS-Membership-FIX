@@ -54,7 +54,7 @@ export default function Profile() {
     if (member) {
       fetchUser(member);
     }
-  }, []);
+  }, [fetchUser]);
 
   useEffect(() => {
     if (userData) {

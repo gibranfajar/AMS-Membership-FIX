@@ -25,7 +25,7 @@ export default function Promo() {
 
   useEffect(() => {
     fetchPromos(member as string);
-  }, []);
+  }, [fetchPromos]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;
