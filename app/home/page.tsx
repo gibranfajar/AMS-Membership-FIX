@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchUser } from "@/actions/userAction";
 import Brand from "@/components/Brand";
 import Carousel from "@/components/Carousel";
 import ModalInputPin from "@/components/ModalInputPin";
@@ -8,7 +9,8 @@ import TabBar from "@/components/TabBar";
 import useFetch from "@/hooks/useFetch";
 import Image from "next/image";
 import Link from "next/link";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 type TierInfo = {
   tier: string;
@@ -24,15 +26,29 @@ type MemberInfo = {
 };
 
 export default function Home() {
+  const member = localStorage.getItem("member");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowQr, setIsShowQr] = useState(false);
   const [pin, setPin] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
 
-  const { data, loading, error } = useFetch<MemberInfo>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=1124537252593",
-    "memberInfoData"
-  );
+  const dispatch = useDispatch();
+  const users = useSelector((state: any) => state.users.user);
+
+  if (users.loading === true) {
+    return <p>Loading...</p>;
+  }
+
+  useEffect(() => {
+    if (member) {
+      fetchUser(dispatch);
+    }
+  }, [dispatch, member]);
+
+  // const { data, loading, error } = useFetch<MemberInfo>(
+  //   `https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=${member}`,
+  //   "memberInfoData"
+  // );
 
   const handlePopUpQr = () => {
     setIsModalVisible(true);
@@ -45,7 +61,7 @@ export default function Home() {
 
   const handleCheckPin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (pin === data?.pin) {
+    if (pin === users.pin) {
       setIsModalVisible(false);
       setIsShowQr(true);
       setPin("");
@@ -57,17 +73,23 @@ export default function Home() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  // if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="bg-base-accent min-h-screen">
       <div className="flex justify-between items-center p-8">
-        <span className="text-sm text-white">{data?.fullName}</span>
+        <span className="text-sm text-white">{users.fullName}</span>
         <div className="flex justify-center items-center gap-2">
           <div className="flex flex-col items-end">
             <span className="text-xs text-white">Tier Kamu</span>
-            <span className="text-xs text-white">{data?.tierInfo.tier}</span>
+            {users && users.tierInfo ? (
+              <span className="text-xs text-white">{users.tierInfo.tier}</span>
+            ) : (
+              <span className="text-xs text-white">
+                Tier information unavailable
+              </span>
+            )}
           </div>
           <Image
             src="/images/tier/logo-tier.svg"
@@ -92,7 +114,7 @@ export default function Home() {
         <div className="flex justify-between items-center">
           <div className="flex flex-col items-start">
             <span className="text-xs">TOTAL POIN</span>
-            <span className="font-medium">Rp. {data?.points}</span>
+            <span className="font-medium">Rp. {users.points}</span>
           </div>
           <div
             className="flex items-center justify-center border border-base-accent rounded-lg p-2 gap-2 cursor-pointer"
@@ -122,7 +144,7 @@ export default function Home() {
       )}
 
       {/* Modal for QR code */}
-      {isShowQr && <ModalQRCode data={data} closeModal={closeModal} />}
+      {isShowQr && <ModalQRCode data={users} closeModal={closeModal} />}
 
       <div className="flex justify-between items-center p-8 gap-2 bg-white -top-20 relative">
         <div className="flex flex-col justify-center items-center gap-2">

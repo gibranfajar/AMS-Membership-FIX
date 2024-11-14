@@ -1,46 +1,79 @@
 "use client";
 
 import Button from "@/components/Button";
+import ErrorMessage from "@/components/ErrorMessage";
 import Input from "@/components/Input";
 import LogoHeader from "@/components/LogoHeader";
-import useAuth from "@/hooks/useAuth";
 import Link from "next/link";
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import { authLogin } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 export default function Login() {
-  // state untuk input user dan password
-  const [user, setUser] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const [isError, setIsError] = useState(false);
+  const [inputError, setInputError] = useState<{ [key: string]: string }>({});
 
-  const [loading, isLoading] = useState(false);
+  const [data, setData] = useState({
+    user: "",
+    password: "",
+    loading: false,
+    error: "",
+  });
 
-  // Ambil login dari useAuth
-  const { login, user: loggedInUser } = useAuth();
-
-  // handle user input change
-  const userChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setUser(event.target.value);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setData((prevData) => ({
+      ...prevData,
+      [event.target.name]: event.target.value,
+    }));
   };
 
-  // handle password input change
-  const passwordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
+  const validateInputs = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (!data.user) errors.user = "No Telepon tidak boleh kosong";
+    if (!data.password) errors.password = "Password tidak boleh kosong";
+
+    setInputError(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  // handle form submit
+  useEffect(() => {
+    if (Object.keys(inputError).length > 0) {
+      const timer = setTimeout(() => setInputError({}), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [inputError]);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    isLoading(true);
+    if (!validateInputs()) return;
 
-    // Panggil login function dengan user dan password
+    setData((prevData) => ({ ...prevData, loading: true, error: "" }));
+
     try {
-      await login(user, password);
-      console.log("User logged in:", loggedInUser);
-    } catch (error) {
-      console.error("Login failed:", error);
+      const response = await authLogin(
+        { user: data.user, password: data.password },
+        "https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/login"
+      );
+
+      if (response.responseCode == 2002500) {
+        localStorage.setItem("member", response.loginData.memberID);
+        router.push("/home");
+      } else if (response.responseCode == 4002500) {
+        setIsError(true);
+        setTimeout(() => setIsError(false), 3000);
+      } else {
+        console.error("Respons tidak terduga:", response);
+      }
+    } catch (e) {
+      setData((prevData) => ({
+        ...prevData,
+        error: "Login gagal. Silakan coba lagi.",
+      }));
     } finally {
-      isLoading(false);
+      setData({ user: "", password: "", loading: false, error: "" });
     }
   };
 
@@ -50,24 +83,29 @@ export default function Login() {
         <LogoHeader className="mt-20 mx-20 flex" />
       </div>
 
+      <div className="px-8 pt-8">
+        {isError && <ErrorMessage message="No telepon atau password salah!" />}
+      </div>
+
       <div className="flex flex-col m-8">
         <p className="text-sm my-6">Masuk menggunakan kredensial anda</p>
-        <form action="" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <Input
             type="text"
             label="No Telepon"
             name="user"
-            value={user}
-            onChange={userChange}
-            className="mb-4"
+            value={data.user}
+            onChange={handleChange}
+            error={inputError.user}
           />
           <Input
             type="password"
             label="Password"
             name="password"
-            value={password}
-            onChange={passwordChange}
-            className="mb-4"
+            value={data.password}
+            onChange={handleChange}
+            className="mt-4"
+            error={inputError.password}
           />
 
           <p className="text-xs my-6">
@@ -77,7 +115,7 @@ export default function Login() {
           <Button
             label="MASUK AKUN"
             className="bg-base-accent text-white rounded-full w-full p-2"
-            loading={loading}
+            loading={data.loading}
           />
         </form>
       </div>

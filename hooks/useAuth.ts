@@ -1,41 +1,51 @@
 import axios from "axios";
-import { useState } from "react";
 
-interface UserData {
-    memberID: string;
-    fullName: string;
-}
+// Tipe data untuk Register
+type RegisterData = {
+  fullName: string;
+  phone: string;
+  email: string;
+  pin: string;
+  password: string;
+  province: string;
+  city: string;
+  gender: string;
+  dateofBirth: string;
+  minatKategori: string;
+};
 
-interface AuthResponse {
-    loginData: UserData;
-}
+// Fungsi untuk login
+export const authLogin = async (
+  data: { user: string; password: string },
+  url: string
+): Promise<any> => {
+  try {
+    const response = await axios.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Menggunakan JSON untuk data login
+      },
+    });
+    return response.data; // Mengembalikan data hasil login
+  } catch (error) {
+    console.error("Login Error:", error);
+    throw error; // Lemparkan error untuk ditangani di tempat lain
+  }
+};
 
-const useAuth = () => {
-    const [user, setUser] = useState<UserData | null>(null);
-
-    const loginUser = async (user: string, password: string) => {
-        try {
-            // Ganti 'login' dengan URL endpoint yang sesuai
-            const response = await axios.post<AuthResponse>('https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/login', { user, password }, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            setUser(response.data.loginData);
-        } catch (error) {
-            console.error('Error logging in:', error);
-        }
-    };
-
-    const logout = () => {
-        setUser(null);
-    };
-
-    return {
-        user,
-        login: loginUser,
-        logout,
-    };
-}
-
-export default useAuth;
+// Fungsi untuk register
+export const authRegister = async (
+  data: RegisterData,
+  url: string
+): Promise<any> => {
+  try {
+    const response = await axios.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Menggunakan JSON untuk data registrasi
+      },
+    });
+    return response.data; // Mengembalikan data hasil registrasi
+  } catch (error) {
+    console.log("Register Error:", error);
+    throw error; // Lemparkan error untuk ditangani di tempat lain
+  }
+};

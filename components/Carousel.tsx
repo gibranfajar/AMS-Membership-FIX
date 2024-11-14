@@ -42,6 +42,8 @@ const Carousel: React.FC = () => {
                 src={`https://web.amscorp.id:3060/imagestorage/promo/${item.imageUrl}`}
                 alt={`Image ${item.id}`}
                 className="w-full h-auto rounded-lg"
+                width={500}
+                height={500}
               />
             </SwiperSlide>
           ))}

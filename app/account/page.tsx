@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchUser } from "@/actions/userAction";
 import MenuAccount from "@/components/MenuAccount";
 import ModalInputPin from "@/components/ModalInputPin";
 import ModalQRCode from "@/components/ModalQrCode";
@@ -9,7 +10,8 @@ import useFetch from "@/hooks/useFetch";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 type MemberInfo = {
   memberID: string;
@@ -29,15 +31,29 @@ type TierInfo = {
 
 export default function Account() {
   const router = useRouter();
+  const member = localStorage.getItem("member");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowQr, setIsShowQr] = useState(false);
   const [pin, setPin] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
 
-  const { data, loading, error } = useFetch<MemberInfo>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=1124537252593",
-    "memberInfoData"
-  );
+  const dispatch = useDispatch();
+  const users = useSelector((state: any) => state.users.user);
+
+  if (users.loading === true) {
+    return <p>Loading...</p>;
+  }
+
+  useEffect(() => {
+    if (member) {
+      fetchUser(dispatch);
+    }
+  }, [dispatch, member]);
+
+  // const { data, loading, error } = useFetch<MemberInfo>(
+  //   "https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=1124537252593",
+  //   "memberInfoData"
+  // );
 
   const handlePopUpQr = () => {
     setIsModalVisible(true);
@@ -50,7 +66,7 @@ export default function Account() {
 
   const handleCheckPin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (pin === data?.pin) {
+    if (pin === users?.pin) {
       setIsModalVisible(false);
       setIsShowQr(true);
       setPin("");
@@ -63,12 +79,12 @@ export default function Account() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("member");
     router.replace("/");
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading data: {error}</p>;
+  // if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error loading data: {error}</p>;
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -84,11 +100,13 @@ export default function Account() {
               className="logo shadow w-full h-auto"
             />
             <div className="absolute inset-0 flex flex-col items-start justify-start z-10 p-4">
-              <span className="text-xs text-white">{data?.fullName}</span>
+              <span className="text-xs text-white">{users?.fullName}</span>
               <span className="text-[8px] text-white">MEMBER SEJAK 2021</span>
             </div>
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <span className="text-xs text-white">{data?.tierInfo.tier}</span>
+              <span className="text-xs text-white">
+                {users && users.tierInfo ? users.tierInfo.tier : ""}
+              </span>
               <span className="text-[8px] text-white">TIER ANDA</span>
             </div>
             <div className="absolute inset-0 flex items-end justify-between z-10 p-6">
@@ -123,12 +141,13 @@ export default function Account() {
         </div>
 
         <h2 className="text-white font-medium my-4 self-start">
-          {data?.fullName}
+          {users?.fullName}
         </h2>
 
         <div className="flex justify-between items-center w-full">
           <small className="text-white">
-            RP {data?.tierInfo.amountUpTo} untuk tier selanjutnya
+            RP {users && users.tierInfo ? users.tierInfo.amountUpTo : ""} untuk
+            tier selanjutnya
           </small>
           <small className="text-white">75%</small>
         </div>
@@ -144,7 +163,7 @@ export default function Account() {
         </div>
 
         <div className="flex justify-between items-center w-full">
-          <span className="text-yellow-500 text-lg">Rp. {data?.points}</span>
+          <span className="text-yellow-500 text-lg">Rp. {users?.points}</span>
           <Link
             href="/history-point"
             className="text-white text-[10px] underline"
@@ -166,7 +185,7 @@ export default function Account() {
       )}
 
       {/* Modal for QR code */}
-      {isShowQr && <ModalQRCode data={data} closeModal={closeModal} />}
+      {isShowQr && <ModalQRCode data={users} closeModal={closeModal} />}
 
       {/* Menu Section */}
       <MenuAccount />
