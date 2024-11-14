@@ -11,7 +11,7 @@ import Link from "next/link";
 import React, { FormEvent, useEffect, useState } from "react";
 
 export default function Home() {
-  const [member, setMember] = useState<String | null>(null);
+  const [member, setMember] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowQr, setIsShowQr] = useState(false);
   const [pin, setPin] = useState("");
@@ -24,7 +24,12 @@ export default function Home() {
       const data = localStorage.getItem("member");
       setMember(data);
     }
-    fetchUser(member as string);
+  }, []);
+
+  useEffect(() => {
+    if (member) {
+      fetchUser(member);
+    }
   }, [fetchUser, member]);
 
   const handlePopUpQr = () => {
