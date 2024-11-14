@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,12 +10,21 @@ import "swiper/css/navigation";
 import { usePromoContext } from "@/context/PromoContext";
 
 const Carousel: React.FC = () => {
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const { promoData, loading, error, fetchPromos } = usePromoContext();
 
   useEffect(() => {
-    fetchPromos(member as string);
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
   }, []);
+
+  useEffect(() => {
+    if (member) {
+      fetchPromos(member);
+    }
+  }, [fetchPromos, member]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;

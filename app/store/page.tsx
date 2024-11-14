@@ -15,14 +15,21 @@ type Store = {
 };
 
 export default function Store() {
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const { storeData, loading, error, fetchStore } = useStoreContext();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
+  }, []);
 
   useEffect(() => {
     if (member) {
       fetchStore(member);
     }
-  }, []);
+  }, [fetchStore, member]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [detail, setDetail] = useState<Store | null>(null);
@@ -31,7 +38,7 @@ export default function Store() {
     storeData?.find((item) => {
       if (item.storeID === storeID) {
         setIsModalVisible(true);
-        setDetail(item as any);
+        setDetail(item);
         return true;
       }
     });

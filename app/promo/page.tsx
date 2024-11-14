@@ -20,12 +20,21 @@ export default function Promo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [detail, setDetail] = useState<Promo | null>(null);
 
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const { promoData, loading, error, fetchPromos } = usePromoContext();
 
   useEffect(() => {
-    fetchPromos(member as string);
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
   }, []);
+
+  useEffect(() => {
+    if (member) {
+      fetchPromos(member);
+    }
+  }, [fetchPromos, member]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;

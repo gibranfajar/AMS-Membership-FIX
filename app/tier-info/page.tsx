@@ -26,14 +26,21 @@ interface Tier {
 }
 
 export default function TierInfo() {
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const { tierData, loading, error, fetchTier } = useTierContext();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
+  }, []);
 
   useEffect(() => {
     if (member) {
       fetchTier(member);
     }
-  }, []);
+  }, [fetchTier, member]);
 
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
 
