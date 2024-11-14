@@ -22,7 +22,7 @@ export default function Store() {
     if (member) {
       fetchStore(member);
     }
-  }, [fetchStore]);
+  }, [fetchStore, member]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [detail, setDetail] = useState<Store | null>(null);
@@ -31,7 +31,7 @@ export default function Store() {
     storeData?.find((item) => {
       if (item.storeID === storeID) {
         setIsModalVisible(true);
-        setDetail(item as any);
+        setDetail(item);
         return true;
       }
     });

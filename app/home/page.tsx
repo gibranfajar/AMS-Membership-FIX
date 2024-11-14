@@ -23,7 +23,7 @@ export default function Home() {
     if (member) {
       fetchUser(member);
     }
-  }, [fetchUser]);
+  }, [fetchUser, member]);
 
   const handlePopUpQr = () => {
     setIsModalVisible(true);

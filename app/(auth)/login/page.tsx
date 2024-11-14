@@ -66,10 +66,7 @@ export default function Login() {
         console.error("Respons tidak terduga:", response);
       }
     } catch (error) {
-      setData((prevData) => ({
-        ...prevData,
-        error: "Login gagal. Silakan coba lagi.",
-      }));
+      console.log("Error submitting form:", error);
     } finally {
       setData({ user: "", password: "", loading: false, error: "" });
     }

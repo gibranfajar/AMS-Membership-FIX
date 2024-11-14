@@ -33,7 +33,7 @@ export default function TierInfo() {
     if (member) {
       fetchTier(member);
     }
-  }, [fetchTier]);
+  }, [fetchTier, member]);
 
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
 
