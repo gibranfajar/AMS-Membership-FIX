@@ -15,8 +15,15 @@ type Store = {
 };
 
 export default function Store() {
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const { storeData, loading, error, fetchStore } = useStoreContext();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
+  }, []);
 
   useEffect(() => {
     if (member) {

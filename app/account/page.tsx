@@ -13,13 +13,20 @@ import React, { FormEvent, useEffect, useState } from "react";
 
 export default function Account() {
   const router = useRouter();
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowQr, setIsShowQr] = useState(false);
   const [pin, setPin] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { userData, loading, error, fetchUser } = useUserContext();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
+  }, []);
 
   useEffect(() => {
     if (member) {

@@ -30,7 +30,7 @@ type ApiResponseOption = {
 type Option = { id: string | number; label: string };
 
 export default function Profile() {
-  const member = localStorage.getItem("member");
+  const [member, setMember] = useState<string | null>(null);
   const [optionsProv, setOptionsProv] = useState<Option[]>([]);
   const [optionsCity, setOptionsCity] = useState<Option[]>([]);
   const [prov, setProv] = useState("");
@@ -49,6 +49,12 @@ export default function Profile() {
   });
 
   const { userData, loading, error, fetchUser } = useUserDetailContext();
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = localStorage.getItem("member");
+      setMember(data);
+    }
+  }, []);
 
   useEffect(() => {
     if (member) {
