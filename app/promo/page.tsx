@@ -6,16 +6,26 @@ import { usePromoContext } from "@/context/PromoContext";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
+type Promo = {
+  id: number;
+  imageTitle: string;
+  imageSubTitle: string;
+  imageUrl: string;
+  promoTitle: string;
+  promoDetail: string;
+  promoEndDate: string;
+};
+
 export default function Promo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [detail, setDetail] = useState<any>(null);
+  const [detail, setDetail] = useState<Promo | null>(null);
 
   const member = localStorage.getItem("member");
   const { promoData, loading, error, fetchPromos } = usePromoContext();
 
   useEffect(() => {
     fetchPromos(member as string);
-  }, [member]);
+  }, []);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading data: {error}</p>;

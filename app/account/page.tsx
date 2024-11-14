@@ -25,7 +25,7 @@ export default function Account() {
     if (member) {
       fetchUser(member);
     }
-  }, [member]);
+  }, []);
 
   const handlePopUpQr = () => {
     setIsModalVisible(true);
