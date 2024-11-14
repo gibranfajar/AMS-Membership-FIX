@@ -1,10 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: true,
   images: {
-    domains: ["via.placeholder.com", "web.amscorp.id","www.google.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'web.amscorp.id',  // Domain pertama
+        pathname: '/imagestorage/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',  // Domain kedua
+        pathname: '/**',
+      },
+    ],
   },
 };
 

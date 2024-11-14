@@ -1,11 +1,11 @@
 "use client";
 
 import Header from "@/components/Header";
-import useFetch from "@/hooks/useFetch";
+import { useStoreContext } from "@/context/StoreContext";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-type LocationData = {
+type Store = {
   brand: string;
   storeID: string;
   kota: string;
@@ -15,19 +15,23 @@ type LocationData = {
 };
 
 export default function Store() {
-  const { data, loading, error } = useFetch<LocationData[]>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/location/list?memberID=1124537252593",
-    "storeLocationData"
-  );
+  const member = localStorage.getItem("member");
+  const { storeData, loading, error, fetchStore } = useStoreContext();
+
+  useEffect(() => {
+    if (member) {
+      fetchStore(member);
+    }
+  }, [member]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [detail, setDetail] = useState<LocationData | null>(null);
+  const [detail, setDetail] = useState<Store | null>(null);
 
   const showModal = ({ storeID }: { storeID: string }) => {
-    data?.find((item) => {
+    storeData?.find((item) => {
       if (item.storeID === storeID) {
         setIsModalVisible(true);
-        setDetail(item);
+        setDetail(item as any);
         return true;
       }
     });
@@ -105,8 +109,8 @@ export default function Store() {
       )}
 
       <div className="flex flex-col items-center justify-center p-4">
-        {data &&
-          data.map((location) => (
+        {storeData &&
+          storeData.map((location) => (
             <div
               key={location.storeID}
               className="bg-white p-4 w-full rounded-lg border border-gray-300 flex items-center justify-between cursor-pointer mb-4"

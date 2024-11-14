@@ -60,7 +60,7 @@ export default function Login() {
 
       if (response.responseCode == 2002500) {
         localStorage.setItem("member", response.loginData.memberID);
-        router.push("/home");
+        window.location.href = "/home";
       } else if (response.responseCode == 4002500) {
         setIsError(true);
         setTimeout(() => setIsError(false), 3000);

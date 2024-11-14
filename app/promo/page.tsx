@@ -2,31 +2,26 @@
 
 import Countdown from "@/components/Countdown";
 import Header from "@/components/Header";
-import useFetch from "@/hooks/useFetch";
+import { usePromoContext } from "@/context/PromoContext";
 import Image from "next/image";
-import React, { useState } from "react";
-
-type PromoData = {
-  id: number;
-  imageTitle: string;
-  imageSubTitle: string;
-  imageUrl: string;
-  promoTitle: string;
-  promoDetail: string;
-  promoEndDate: string;
-};
+import React, { useEffect, useState } from "react";
 
 export default function Promo() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [detail, setDetail] = useState<PromoData | null>(null);
+  const [detail, setDetail] = useState<any>(null);
 
-  const { data, loading, error } = useFetch<PromoData[]>(
-    "https://golangapi-j5iu.onrender.com/api/member/mobile/promo/list?memberID=1124537252593",
-    "promoData"
-  );
+  const member = localStorage.getItem("member");
+  const { promoData, loading, error, fetchPromos } = usePromoContext();
+
+  useEffect(() => {
+    fetchPromos(member as string);
+  }, [member]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading data: {error}</p>;
 
   const showModal = ({ id }: { id: number }) => {
-    data?.find((item) => {
+    promoData?.find((item) => {
       if (item.id === id) {
         setIsModalVisible(true);
         setDetail(item);
@@ -62,7 +57,7 @@ export default function Promo() {
 
       {/* card */}
       <div className="p-4">
-        {data?.map((item) => (
+        {promoData?.map((item) => (
           <div
             key={item.id}
             className="bg-white w-full rounded-lg flex flex-col items-center justify-between cursor-pointer mb-4"
