@@ -167,7 +167,7 @@ export default function Profile() {
     setPin((prevPin) => ({ ...prevPin, loading: true }));
 
     // validasi
-    let errors = [];
+    const errors: string[] = [];
     if (!pin.pin) errors.push("PIN harus diisi");
     if (!pin.confirmPin) errors.push("PIN konfirmasi harus diisi");
 
