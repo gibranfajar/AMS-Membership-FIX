@@ -37,7 +37,7 @@ export const StoreProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://golangapi-j5iu.onrender.com/api/member/mobile/location/list?memberID=${member}`
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/location/list?memberID=${member}`
       );
       setStoreData(response.data.storeLocationData);
       setFetched(true); // Menandai bahwa data telah diambil sekali

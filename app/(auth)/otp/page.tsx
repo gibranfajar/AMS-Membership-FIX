@@ -3,9 +3,11 @@
 import Button from "@/components/Button";
 import LogoHeader from "@/components/LogoHeader";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
 export default function Otp() {
+  const router = useRouter();
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
 
   const inputRefs = [
@@ -41,6 +43,21 @@ export default function Otp() {
       focusPreviousInput(index);
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const otpInput = otpValues.join("");
+    const getOtp = sessionStorage.getItem("otp");
+
+    // Validate the OTP
+    if (getOtp === otpInput) {
+      router.push(`/reset-password`);
+    } else {
+      console.log("Kode OTP yang Anda masukkan salah!");
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center">
       <LogoHeader className="m-20" />
@@ -50,7 +67,7 @@ export default function Otp() {
         <p className="text-xs text-center my-6">
           kode OTP akan dikirmkan melalui WA
         </p>
-        <form action="">
+        <form action="" onSubmit={handleSubmit}>
           <div className="flex justify-center mb-6">
             {inputRefs.map((ref, index) => (
               <input

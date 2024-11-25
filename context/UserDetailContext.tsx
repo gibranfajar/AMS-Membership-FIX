@@ -17,6 +17,7 @@ interface User {
   city: string;
   cityID: string;
   gender: string;
+  dateofBirth: string;
 }
 
 interface UserDetailContextType {
@@ -44,7 +45,7 @@ export const UserDetailProvider: FC<{ children: ReactNode }> = ({
     setError(null);
     try {
       const response = await axios.get(
-        `https://golangapi-j5iu.onrender.com/api/member/mobile/profile?memberID=${userId}`
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/profile?memberID=${userId}`
       );
       setUserData(response.data.memberData);
       setFetched(true); // Tandai bahwa data telah diambil

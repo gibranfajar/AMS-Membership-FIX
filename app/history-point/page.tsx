@@ -23,7 +23,7 @@ export default function HistoryPoint() {
       </Header>
 
       <div className="flex flex-col items-center p-4">
-        <div className="bg-white p-4 w-full rounded-lg border border-gray-300 flex items-center justify-between cursor-pointer">
+        <div className="bg-white p-4 w-full rounded-lg border border-gray-300 flex items-center justify-between">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col">
               <small className="text-xs">RM103 - MISSISSIPPI</small>

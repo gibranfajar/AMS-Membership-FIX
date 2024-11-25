@@ -1,11 +1,11 @@
 import Image from "next/image";
 import React from "react";
 
-type ErrorProps = {
+type SuccessProps = {
   message: string;
 };
 
-export default function SuccessMessage({ message }: ErrorProps) {
+export default function SuccessMessage({ message }: SuccessProps) {
   return (
     <div className="flex justify-center items-center">
       <div className="bg-green-600 text-white px-4 py-2 w-full flex gap-2 items-center">

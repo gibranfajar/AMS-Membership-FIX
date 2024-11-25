@@ -4,6 +4,7 @@ import { PromoProvider } from "@/context/PromoContext";
 import { UserDetailProvider } from "./UserDetailContext";
 import { TierProvider } from "./TierContext";
 import { StoreProvider } from "./StoreContext";
+import { PhoneProvider } from "./PhoneContext";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -15,7 +16,9 @@ const AppProviders: FC<AppProvidersProps> = ({ children }) => {
       <UserDetailProvider>
         <TierProvider>
           <StoreProvider>
-            <PromoProvider>{children}</PromoProvider>
+            <PhoneProvider>
+              <PromoProvider>{children}</PromoProvider>
+            </PhoneProvider>
           </StoreProvider>
         </TierProvider>
       </UserDetailProvider>

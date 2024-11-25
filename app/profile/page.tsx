@@ -1,9 +1,12 @@
 "use client";
 
 import Button from "@/components/Button";
+import ErrorMessage from "@/components/ErrorMessage";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
+import SuccessMessage from "@/components/SuccessMessage";
 import { useUserDetailContext } from "@/context/UserDetailContext";
+import axios from "axios";
 import React, { FormEvent, useEffect, useState } from "react";
 
 type MemberInfo = {
@@ -16,6 +19,7 @@ type MemberInfo = {
   city: string;
   cityID: string;
   gender: string;
+  dateofBirth: string;
 };
 
 type ApiResponseOption = {
@@ -35,6 +39,9 @@ export default function Profile() {
   const [optionsCity, setOptionsCity] = useState<Option[]>([]);
   const [prov, setProv] = useState("");
   const [city, setCity] = useState("");
+  const [successMessage, setSuccessMessage] = useState<boolean | false>(false);
+  const [errorMessage, setErrorMessage] = useState<boolean | false>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<MemberInfo>({
     memberID: "",
@@ -46,9 +53,11 @@ export default function Profile() {
     city: "",
     cityID: "",
     gender: "",
+    dateofBirth: "",
   });
 
   const { userData, loading, error, fetchUser } = useUserDetailContext();
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const data = localStorage.getItem("member");
@@ -73,7 +82,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchDataProvince = async () => {
       const response = await fetch(
-        "https://golangapi-j5iu.onrender.com/api/member/mobile/provinces"
+        "https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/provinces"
       );
       const data: ApiResponseOption = await response.json();
       setOptionsProv(
@@ -90,7 +99,7 @@ export default function Profile() {
     if (prov) {
       const fetchDataCity = async () => {
         const response = await fetch(
-          `https://golangapi-j5iu.onrender.com/api/member/mobile/cities?provID=${prov}`
+          `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/cities?provID=${prov}`
         );
         const data: ApiResponseOption = await response.json();
         setOptionsCity(
@@ -117,17 +126,73 @@ export default function Profile() {
     }));
   };
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // set loading
+    setIsLoading(true);
+
+    // Submit data to server
+    const data = {
+      memberID: formData.memberID,
+      fullName: formData.fullName,
+      phone: formData.phone,
+      email: formData.email,
+      province: formData.provinceID,
+      city: formData.cityID,
+      gender: formData.gender == "PRIA" ? "l" : "p",
+      dateofBirth: formData.dateofBirth,
+      minatKategori: "-",
+    };
+
+    try {
+      const response = await axios.put(
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/profile`,
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      // check response status
+      if (response.data.responseCode === "2002500") {
+        // show success message
+        setSuccessMessage(true);
+        // remove message after 3 seconds
+        setTimeout(() => setSuccessMessage(false), 3000);
+      } else if (response.data.responseCode === "4002500") {
+        // show error message
+        setErrorMessage(true);
+        // remove message after 3 seconds
+        setTimeout(() => setErrorMessage(false), 3000);
+      } else {
+        console.error("Terjadi kesalahan pada server");
+      }
+    } catch (error) {
+      console.log("Terjadi kesalahan:", error);
+    } finally {
+      // reset loading
+      setIsLoading(false);
+    }
+  };
+
   if (loading) return <p>Loading</p>;
   if (error) return <p>Error loading data: {error}</p>;
 
   return (
     <div className="flex flex-col mt-10">
       <div className="flex flex-col m-8">
+        {successMessage ? (
+          <SuccessMessage message="Data berhasil diubah" />
+        ) : (
+          <></>
+        )}
+        {errorMessage ? <ErrorMessage message="Data gagal diubah" /> : <></>}
+
         <h1 className="text-lg font-medium">Edit Profil</h1>
         <p className="text-xs mt-4 mb-8">
           Pastikan data anda diperbaharui dengan benar
         </p>
-        <form action="" onSubmit={() => {}}>
+
+        <form action="" onSubmit={handleSubmit}>
           <Input
             label="*No Handphone"
             type="text"
@@ -204,6 +269,7 @@ export default function Profile() {
           <Button
             label="SIMPAN"
             className="bg-base-accent text-white rounded-full w-full p-2 my-6"
+            loading={isLoading}
           />
         </form>
       </div>

@@ -23,6 +23,7 @@ interface Tier {
   amountUpTo: number;
   tier_image: string;
   benefitData: BenefitData;
+  cardImage: string;
 }
 
 export default function TierInfo() {
@@ -101,8 +102,8 @@ export default function TierInfo() {
             <div className="flex justify-center items-center relative p-4">
               <div className="relative">
                 <Image
-                  src={"/images/tier/tier-red.svg"}
-                  alt="Tier"
+                  src={`https://amscorp.id/card/${selectedTier.cardImage}`}
+                  alt={selectedTier.tier}
                   width={250}
                   height={250}
                   className="shadow w-full h-auto"

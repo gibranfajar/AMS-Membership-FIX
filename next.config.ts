@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: 'via.placeholder.com',  // Domain kedua
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'amscorp.id',  // Domain ketiga
+        pathname: '/card/**',
+      },
     ],
   },
 };

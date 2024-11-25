@@ -5,6 +5,7 @@ import Carousel from "@/components/Carousel";
 import ModalInputPin from "@/components/ModalInputPin";
 import ModalQRCode from "@/components/ModalQrCode";
 import TabBar from "@/components/TabBar";
+import { usePhone } from "@/context/PhoneContext";
 import { useUserContext } from "@/context/UserContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,6 +19,14 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState(false);
 
   const { userData, loading, error, fetchUser } = useUserContext();
+  const { clearSession } = usePhone();
+
+  useEffect(() => {
+    // Fungsi untuk menghapus semua data session storage
+    setTimeout(() => {
+      clearSession();
+    }, 3000);
+  }, [clearSession]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -70,10 +79,10 @@ export default function Home() {
             </span>
           </div>
           <Image
-            src="/images/tier/logo-tier.svg"
+            src={`https://amscorp.id/card/${userData?.tierInfo.profileImage}`}
             width={50}
             height={50}
-            alt="logo"
+            alt={`${userData?.tierInfo.profileImage}`}
             className="h-10 w-10 rounded-full"
           />
         </div>

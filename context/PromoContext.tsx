@@ -38,7 +38,7 @@ export const PromoProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://golangapi-j5iu.onrender.com/api/member/mobile/promo/list?memberID=${member}`
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/promo/list?memberID=${member}`
       );
       setPromoData(response.data.promoData);
       setFetched(true); // Menandai bahwa data telah diambil sekali
