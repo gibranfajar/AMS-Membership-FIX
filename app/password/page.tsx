@@ -107,7 +107,7 @@ export default function Profile() {
     // set loading
     setPassword((prevPassword) => ({ ...prevPassword, loading: true }));
 
-    let errors = [];
+    const errors: string[] = [];
     if (!password.currentPassword) errors.push("Password lama harus diisi");
     if (!password.password) errors.push("Password baru harus diisi");
     if (!password.confirmPassword)
