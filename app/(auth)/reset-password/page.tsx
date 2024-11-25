@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import ErrorMessage from "@/components/ErrorMessage";
 import Input from "@/components/Input";
 import SuccessMessage from "@/components/SuccessMessage";
 import axios from "axios";
@@ -66,7 +67,7 @@ export default function ResetPassword() {
     // set loading
     setPassword((prevPassword) => ({ ...prevPassword, loading: true }));
 
-    let errors = [];
+    const errors: string[] = [];
     if (!password.password) errors.push("Password baru harus diisi");
     if (!password.confirmPassword)
       errors.push("Konfirmasi password baru harus diisi");
@@ -127,6 +128,9 @@ export default function ResetPassword() {
         <h1 className="text-lg font-medium">Atur ulang password</h1>
         {successMessagePassword && (
           <SuccessMessage message="Password berhasil diatur ulang" />
+        )}
+        {errorMessagePassword && (
+          <ErrorMessage message="Password gagal diatur ulang" />
         )}
         <div className="mt-6">
           <form onSubmit={handleSubmitPassword}>
