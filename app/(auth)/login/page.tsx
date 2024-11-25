@@ -7,8 +7,13 @@ import LogoHeader from "@/components/LogoHeader";
 import Link from "next/link";
 import { authLogin } from "@/hooks/useAuth";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { usePhone } from "@/context/PhoneContext";
 
 export default function Login() {
+  const router = useRouter();
+  const { setPhone, setOtp } = usePhone();
   const [isError, setIsError] = useState(false);
   const [inputError, setInputError] = useState<{ [key: string]: string }>({});
 
@@ -53,17 +58,38 @@ export default function Login() {
     try {
       const response = await authLogin(
         { user: data.user, password: data.password },
-        "https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/login"
+        "https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/dashboard/login"
       );
 
       if (response.responseCode == 2002500) {
         localStorage.setItem("member", response.loginData.memberID);
-        window.location.href = "/home";
+        router.push("/home");
+      } else if (response.responseCode == 4002501) {
+        //Tampilkan OTP
+        const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+        setPhone(data.user);
+        setOtp(randomNumber.toString());
+
+        //kirim otp ke API post
+        const response = await axios.post(
+          `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/dashboard/Verify?userAccount=${data.user}`,
+          {
+            randomNumber: randomNumber,
+          }
+        );
+
+        if (response.data.responseCode === "4002500") {
+          console.log("No telpon tidak terdaftar");
+        } else if (response.data.responseCode === "2002500") {
+          router.push("/otp-register");
+        } else {
+          console.log("Invalid response data:", response.data);
+        }
       } else if (response.responseCode == 4002500) {
         setIsError(true);
         setTimeout(() => setIsError(false), 3000);
       } else {
-        console.error("Respons tidak terduga:", response);
+        console.log("Respons tidak terduga:", response);
       }
     } catch (error) {
       console.log("Error submitting form:", error);

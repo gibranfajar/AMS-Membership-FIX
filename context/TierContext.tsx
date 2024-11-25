@@ -25,6 +25,7 @@ interface Tier {
   amountUpTo: number;
   tier_image: string;
   benefitData: BenefitData;
+  cardImage: string;
 }
 
 interface TierContextType {
@@ -48,7 +49,7 @@ export const TierProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://golangapi-j5iu.onrender.com/api/member/mobile/tier/list?memberID=${member}`
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/tier/list?memberID=${member}`
       );
       setTierData(response.data.tierData);
       setFetched(true); // Menandai bahwa data telah diambil sekali

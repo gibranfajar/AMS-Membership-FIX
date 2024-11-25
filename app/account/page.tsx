@@ -72,8 +72,8 @@ export default function Account() {
         <div className="flex justify-center items-center relative w-full">
           <div className="relative">
             <Image
-              src="/images/tier/card-tier.svg"
-              alt="TierFi"
+              src={`https://amscorp.id/card/${userData?.tierInfo.cardImage}`}
+              alt={`${userData?.tierInfo.cardImage}`}
               width={250}
               height={250}
               className="logo shadow w-full h-auto"

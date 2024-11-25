@@ -12,6 +12,8 @@ interface TierInfo {
   tierImage: string;
   amountStartingFrom: number;
   amountUpTo: number;
+  profileImage: string;
+  cardImage: string;
 }
 
 interface User {
@@ -44,7 +46,7 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://golangapi-j5iu.onrender.com/api/member/mobile/dashboard/info?memberID=${userId}`
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/dashboard/info?memberID=${userId}`
       );
       setUserData(response.data.memberInfoData);
       setFetched(true); // Tandai bahwa data telah diambil

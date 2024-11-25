@@ -1,45 +1,52 @@
+import axios from "axios";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+interface Brand {
+  id: number;
+  brand: string;
+}
 
 export default function Brand() {
+  // state
+  const [brands, setBrands] = useState<Brand[]>([]);
+
+  // Fetch brands from API
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get(
+        "https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/brand"
+      );
+
+      if (response.data.responseCode) {
+        setBrands(response.data.brandData);
+      }
+    } catch (error) {
+      console.log("Error fetching brands:", error);
+    }
+  };
+
+  // Fetch brands when component mounts
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div className="p-8 bg-gray-200 rounded-md flex justify-center">
-        <Image
-          src="/images/brands/celcius.svg"
-          width={150}
-          height={150}
-          alt="celcius"
-          className="w-auto h-auto"
-        />
-      </div>
-      <div className="p-8 bg-gray-200 rounded-md flex justify-center">
-        <Image
-          src="/images/brands/celcius-woman.svg"
-          width={150}
-          height={150}
-          alt="celcius-woman"
-          className="w-auto h-auto"
-        />
-      </div>
-      <div className="p-8 bg-gray-200 rounded-md flex justify-center">
-        <Image
-          src="/images/brands/mississippi.svg"
-          width={150}
-          height={150}
-          alt="mississippi"
-          className="w-auto h-auto"
-        />
-      </div>
-      <div className="p-8 bg-gray-200 rounded-md flex justify-center">
-        <Image
-          src="/images/brands/queensland.svg"
-          width={150}
-          height={150}
-          alt="queensland"
-          className="w-auto h-auto"
-        />
-      </div>
+      {brands.map((brand) => (
+        <div
+          className="p-8 bg-gray-200 rounded-md flex justify-center"
+          key={brand.id}
+        >
+          <Image
+            src="/images/brands/celcius.svg"
+            width={150}
+            height={150}
+            alt={brand.brand}
+            className="w-auto h-auto"
+          />
+        </div>
+      ))}
     </div>
   );
 }
