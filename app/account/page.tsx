@@ -14,6 +14,7 @@ import React, { FormEvent, useEffect, useState } from "react";
 export default function Account() {
   const router = useRouter();
   const [member, setMember] = useState<string | null>(null);
+  const [year, setYear] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowQr, setIsShowQr] = useState(false);
   const [pin, setPin] = useState("");
@@ -31,6 +32,8 @@ export default function Account() {
   useEffect(() => {
     if (member) {
       fetchUser(member);
+      const currentYear = userData?.joinDate.slice(0, 4);
+      setYear(currentYear || "");
     }
   }, [fetchUser, member]);
 
@@ -80,7 +83,7 @@ export default function Account() {
             />
             <div className="absolute inset-0 flex flex-col items-start justify-start z-10 p-4">
               <span className="text-xs text-white">{userData?.fullName}</span>
-              <span className="text-[8px] text-white">MEMBER SEJAK 2021</span>
+              <span className="text-[8px] text-white">MEMBER SEJAK {year}</span>
             </div>
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
               <span className="text-xs text-white">
@@ -127,11 +130,16 @@ export default function Account() {
           <small className="text-white">
             RP {userData?.tierInfo.amountUpTo} Poin untuk tier selanjutnya
           </small>
-          <small className="text-white">75%</small>
+          <small className="text-white">
+            {userData?.tierInfo.memberPersentase}%
+          </small>
         </div>
 
         {/* Progress Bar */}
-        <ProgressBar currentValue={75} maxValue={100} />
+        <ProgressBar
+          currentValue={userData?.tierInfo.memberPersentase || 0}
+          maxValue={100}
+        />
 
         <div className="flex justify-between items-center w-full my-2">
           <small className="text-white">TOTAL POINT</small>

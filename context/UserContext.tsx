@@ -14,6 +14,7 @@ interface TierInfo {
   amountUpTo: number;
   profileImage: string;
   cardImage: string;
+  memberPersentase: number;
 }
 
 interface User {
@@ -22,6 +23,7 @@ interface User {
   phone: string;
   pin: string;
   points: number;
+  joinDate: string;
   tierInfo: TierInfo;
 }
 

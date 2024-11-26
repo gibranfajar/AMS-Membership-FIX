@@ -2,13 +2,19 @@
 
 import Button from "@/components/Button";
 import LogoHeader from "@/components/LogoHeader";
-import Link from "next/link";
+import SuccessMessage from "@/components/SuccessMessage";
+import { usePhone } from "@/context/PhoneContext";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
 export default function Otp() {
   const router = useRouter();
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const { setOtp } = usePhone();
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [message, setMessage] = useState(false);
 
   const inputRefs = [
     useRef<HTMLInputElement | null>(null),
@@ -58,9 +64,44 @@ export default function Otp() {
     }
   };
 
+  const handleRecodeOTP = async () => {
+    const randomNumber = Math.floor(Math.random() * 900000) + 100000;
+    setOtp(randomNumber.toString());
+    const getPhone = sessionStorage.getItem("phone");
+
+    const response = await axios.post(
+      `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/dashboard/Verify?userAccount=${getPhone}`,
+      { randomNumber }
+    );
+
+    if (response.data.responseCode === "2002500") {
+      setMessage(true);
+      setTimeout(() => {
+        setMessage(false);
+      }, 3000);
+    } else {
+      console.log("Error OTP:", response.data);
+    }
+
+    setCountdown(30);
+    setIsWaiting(true);
+    const timer = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown === 1) {
+          clearInterval(timer);
+          setIsWaiting(false);
+          return null;
+        }
+        return prevCountdown ? prevCountdown - 1 : null;
+      });
+    }, 1000);
+  };
+
   return (
     <div className="flex flex-col justify-center items-center">
       <LogoHeader className="m-20" />
+
+      {message && <SuccessMessage message="OTP Berhasil dikirim" />}
 
       <div className="flex flex-col justify-center items-center m-8">
         <h2 className="text-lg font-bold">Masukan kode OTP</h2>
@@ -91,9 +132,15 @@ export default function Otp() {
 
           <p className="text-center text-xs mt-4">
             Tidak menerima kode OTP?{" "}
-            <Link href="" className="font-medium">
-              Kirim ulang OTP
-            </Link>
+            {isWaiting ? (
+              <span className="text-gray-500">
+                Kirim ulang dalam {countdown} detik
+              </span>
+            ) : (
+              <span onClick={handleRecodeOTP} className="cursor-pointer">
+                Kirim ulang OTP.
+              </span>
+            )}
           </p>
         </form>
       </div>

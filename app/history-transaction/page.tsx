@@ -1,19 +1,71 @@
 "use client";
 
 import Header from "@/components/Header";
+import axios from "axios";
 import Image from "next/image";
 import React, { useState } from "react";
 
+interface Transaction {
+  id: number;
+  idMember: string;
+  invoice: string;
+  tanggalTransksi: string;
+  idStore: string;
+  produk: Product[];
+  total: number;
+}
+
+interface Product {
+  id: number;
+  DESKRIPSI: string;
+  QTY: number;
+  Net: number;
+}
+
 export default function HistoryTransaction() {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [data, setData] = useState<Transaction[] | null>(null);
+  const [detail, setDetail] = useState<Transaction | null>(null);
 
-  const showModal = () => {
-    setIsModalVisible(true);
+  const totalQty = detail?.produk.reduce((sum, item) => sum + item.QTY, 0);
+
+  const fetchData = async () => {
+    const member = localStorage.getItem("member");
+    try {
+      const response = await axios.get(
+        `https://golangapi-j5iu.onrender.com/api/v2.0/member/mobile/transaction/history?memberID=${member}`
+      );
+      setData(response.data.transactionData);
+    } catch (error) {
+      console.log("Error fetching data", error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+  const showModal = ({ id }: { id: number }) => {
+    data?.find((item) => {
+      if (item.id === id) {
+        setIsModalVisible(true);
+        setDetail(item);
+        return true;
+      }
+    });
   };
 
   const closeModal = () => {
     setIsModalVisible(false);
   };
+
+  if (!data) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-center text-lg">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-base-accent min-h-screen">
@@ -34,30 +86,34 @@ export default function HistoryTransaction() {
       </Header>
 
       <div className="flex flex-col items-center justify-center p-4">
-        <div
-          className="bg-white p-4 w-full rounded-lg border border-gray-300 flex items-center justify-between cursor-pointer"
-          onClick={showModal}
-        >
-          {/* Kolom kiri */}
-          <div className="flex flex-col space-y-6">
-            {/* Nama toko dan ID */}
-            <div className="flex flex-col">
-              <small className="text-xs">RM103 - MISSISSIPPI</small>
-              <small className="text-[8px]">12565A1AD6BF67B</small>
+        {data &&
+          data.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white p-4 w-full rounded-lg border border-gray-300 flex items-center justify-between cursor-pointer mb-2"
+              onClick={() => showModal({ id: item.id })}
+            >
+              {/* Kolom kiri */}
+              <div className="flex flex-col space-y-6">
+                {/* Nama toko dan ID */}
+                <div className="flex flex-col">
+                  <small className="text-xs">{item.idStore}</small>
+                  <small className="text-[8px]">{item.invoice}</small>
+                </div>
+                {/* Tanggal */}
+                <h2 className="text-xs mt-1">{item.tanggalTransksi}</h2>
+              </div>
+
+              {/* Garis pemisah */}
+              <div className="w-px h-16 bg-gray-300"></div>
+
+              {/* Kolom kanan */}
+              <div className="flex flex-col items-end">
+                <span className="text-xs">Total</span>
+                <span className="text-xs">RP {item.total}</span>
+              </div>
             </div>
-            {/* Tanggal */}
-            <h2 className="text-xs mt-1">29 DESEMBER 2023</h2>
-          </div>
-
-          {/* Garis pemisah */}
-          <div className="w-px h-16 bg-gray-300"></div>
-
-          {/* Kolom kanan */}
-          <div className="flex flex-col items-end">
-            <span className="text-xs">Total</span>
-            <span className="text-xs">RP 394.000</span>
-          </div>
-        </div>
+          ))}
       </div>
 
       {/* modal detail transaksi */}
@@ -72,9 +128,9 @@ export default function HistoryTransaction() {
             </div>
 
             <div className="flex flex-col justify-center items-center gap-1 my-6">
-              <span className="font-bold text-sm">RM13 - MISSISSIPPI</span>
-              <span className="text-xs">12565A1AD6BF67B</span>
-              <span className="text-xs">29 Desember 2023</span>
+              <span className="font-bold text-sm">{detail?.idStore}</span>
+              <span className="text-xs">{detail?.invoice}</span>
+              <span className="text-xs">{detail?.tanggalTransksi}</span>
             </div>
 
             <hr className="my-4" />
@@ -84,16 +140,18 @@ export default function HistoryTransaction() {
 
               {/* Daftar produk */}
               <div className="my-2">
-                <div className="flex justify-between">
-                  <span className="text-sm w-1/2">TS SARKA Baghlaf</span>
-                  <span className="text-xs w-1/4 text-right">1</span>
-                  <span className="text-xs w-1/4 text-right">240,000</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm w-1/2">TS U NEEK Lino</span>
-                  <span className="text-xs w-1/4 text-right">1</span>
-                  <span className="text-xs w-1/4 text-right">145,000</span>
-                </div>
+                {detail &&
+                  detail.produk.map((item) => (
+                    <div className="flex justify-between" key={item.id}>
+                      <span className="text-sm w-1/2">{item.DESKRIPSI}</span>
+                      <span className="text-xs w-1/4 text-right">
+                        {item.QTY}
+                      </span>
+                      <span className="text-xs w-1/4 text-right">
+                        {item.Net}
+                      </span>
+                    </div>
+                  ))}
               </div>
 
               <hr className="my-4" />
@@ -101,8 +159,10 @@ export default function HistoryTransaction() {
               {/* Total item dan harga */}
               <div className="flex justify-between font-bold">
                 <span className="text-sm w-1/2">TOTAL ITEM</span>
-                <span className="text-sm w-1/4 text-right">2</span>
-                <span className="text-sm w-1/4 text-right">385,000</span>
+                <span className="text-sm w-1/4 text-right">{totalQty}</span>
+                <span className="text-sm w-1/4 text-right">
+                  {detail?.total}
+                </span>
               </div>
 
               <hr className="my-4" />
