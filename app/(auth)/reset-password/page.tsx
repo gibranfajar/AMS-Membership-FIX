@@ -24,9 +24,11 @@ export default function ResetPassword() {
   const [successMessagePassword, setSuccessMessagePassword] =
     useState<boolean>(false);
 
+  const phone = sessionStorage.getItem("phone") as string;
+
   // state for password
   const [password, setPassword] = useState<Password>({
-    phoneNumber: sessionStorage.getItem("phone") || "",
+    phoneNumber: phone,
     password: "",
     confirmPassword: "",
     loading: false,
